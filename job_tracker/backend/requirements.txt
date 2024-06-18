@@ -1,0 +1,14 @@
+Flask
+Flask-SQLAlchemy
+Flask-Migrate
+pytest
+pytest-flask
+pytest-mock
+redis
+rq
+rq-scheduler
+rq-dashboard
+flask-cors
+xxhash
+requests
+psycopg2-binary

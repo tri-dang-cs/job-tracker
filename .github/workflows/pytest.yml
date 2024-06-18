@@ -1,0 +1,29 @@
+name: Run pytest on push
+
+on:
+  push:
+    branches:
+      - 'main'
+
+jobs:
+  test:
+    name: Run pytest
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.x'  # Replace with your desired Python version
+
+    - name: Install dependencies
+      run: |
+        cd job_tracker/backend
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt  # Adjust if you have specific dependencies
+
+    - name: Run pytest
+      run: pytest

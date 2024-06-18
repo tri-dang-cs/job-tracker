@@ -1,0 +1,61 @@
+include:
+  - docker-compose-companies.yml
+
+services:
+  redis:
+    image: redis:latest
+
+  db:
+    image: postgres:latest
+    restart: always
+    shm_size: 128mb
+    environment:
+      POSTGRES_DB: 'jt'
+      POSTGRES_USER: 'jt'
+      POSTGRES_PASSWORD: 'password'
+ 
+  rq_dashboard:
+    build: job_tracker
+    command: rq-dashboard -u redis://redis:6379
+    ports:
+      - 9181:9181
+    depends_on:
+      - redis
+
+  job_tracker_service:
+    build: job_tracker
+    environment:
+      REDIS_URL: 'redis://redis:6379/0'
+      DATABASE_URL: 'postgresql+psycopg2://jt:password@db/jt'
+      COMPANIES: 'google,fake_google:5000,127.0.0.1:5001|facebook,fake_facebook:5000,127.0.0.1:5002|microsoft,fake_microsoft:5000,127.0.0.1:5003'
+    command: ./run-service.sh
+    depends_on:
+      - redis
+      - db
+  
+  job_tracker_workers:
+    build: job_tracker
+    environment:
+      REDIS_URL: 'redis://redis:6379/0'
+      DATABASE_URL: 'postgresql+psycopg2://jt:password@db/jt'
+      COMPANIES: 'google,fake_google:5000,127.0.0.1:5001|facebook,fake_facebook:5000,127.0.0.1:5002|microsoft,fake_microsoft:5000,127.0.0.1:5003'
+    command: ./run-worker.sh
+    deploy:
+      mode: replicated
+      replicas: 3
+    depends_on:
+      - redis
+      - db
+
+  job_tracker:
+    build: job_tracker
+    environment:
+      REDIS_URL: 'redis://redis:6379/0'
+      COMPANIES: 'google,fake_google:5000,127.0.0.1:5001|facebook,fake_facebook:5000,127.0.0.1:5002|microsoft,fake_microsoft:5000,127.0.0.1:5003'
+      DATABASE_URL: 'postgresql+psycopg2://jt:password@db/jt'
+      RQ_DASHBOARD: 'http://127.0.0.1:9181'
+    ports:
+      - 5000:5000
+    depends_on:
+      - redis
+      - db
