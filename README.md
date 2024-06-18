@@ -1,12 +1,17 @@
 # Job Tracker
 
-## Live
-
-
-
 ## Description
 
 job tracker app collects job listings from many company websites and stores them in a database that can handle large amounts of data. It checks regularly for new jobs or ones that have been taken down, focusing on what users are interested in. Users can see all the job data collected or set up alerts based on specific keywords. They get email notifications whenever new jobs matching their interests appear, helping them stay updated and find relevant opportunities easily
+
+## Live / Test
+
+- Test link in Project Github header
+- Or can just install and use docker
+```
+docker-compose up --build -d
+```
+- Access [http://localhost:5000](http://localhost:5000)
 
 ## Architecture
 
