@@ -1,5 +1,4 @@
-include:
-  - docker-compose-companies.yml
+version: '3'
 
 services:
   redis:
@@ -7,3 +6,24 @@ services:
     ports:
       - 6379:6379
 
+  fake_google:
+    build: sample_company
+    environment:
+      COMPANY_NAME: 'Fake Google'
+    ports:
+      - "5001:5000"
+
+  fake_facebook:
+    build: sample_company
+    environment:
+      COMPANY_NAME: 'Fake Facebook'
+    ports:
+      - "5002:5000"
+
+  fake_microsoft:
+    build: sample_company
+    environment:
+      COMPANY_NAME: 'Fake Microsoft'
+    ports:
+      - "5003:5000"
+      

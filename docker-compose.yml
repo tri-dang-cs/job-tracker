@@ -1,5 +1,4 @@
-include:
-  - docker-compose-companies.yml
+version: '3'
 
 services:
   redis:
@@ -13,6 +12,28 @@ services:
       POSTGRES_DB: 'jt'
       POSTGRES_USER: 'jt'
       POSTGRES_PASSWORD: 'password'
+
+  fake_google:
+    build: sample_company
+    environment:
+      COMPANY_NAME: 'Fake Google'
+    ports:
+      - "5001:5000"
+
+  fake_facebook:
+    build: sample_company
+    environment:
+      COMPANY_NAME: 'Fake Facebook'
+    ports:
+      - "5002:5000"
+
+  fake_microsoft:
+    build: sample_company
+    environment:
+      COMPANY_NAME: 'Fake Microsoft'
+    ports:
+      - "5003:5000"
+      
  
   rq_dashboard:
     build: job_tracker
