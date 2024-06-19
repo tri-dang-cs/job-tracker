@@ -11,7 +11,7 @@ job tracker app collects job listings from many company websites and stores them
 ```
 docker-compose up --build -d
 ```
-- Access [http://localhost:5000](http://localhost:5000)
+- Access [http://localhost:8000](http://localhost:8000)
 
 ## Architecture
 
@@ -38,15 +38,16 @@ _Diagram created using [Excalidraw](https://excalidraw.com/#json=uK8JM14jXxv8O_M
 
 4. Redis
 - Message queue for sending (from backend) and dispatching (to RQ cluster) tasks
-- Database for workers to coordinate when analyzing tasks results
+- Shared/Fast in-memory database for workers to coordinate when analyzing tasks results
 
 5. RQ Cluster
 - Written in Python + RQ
-- A scheduler to run cronjob
+- A scheduler to run cronjob every time window
 + Check expiration for trackers
-+ Fetch new jobs (supports thousands) and analyzing new data
++ Fetch new jobs from (supports thousands) remote sites
++ Analyze new data, detect new/removed jobs, notify users
 - Several workers to run crawling tasks (can scale horizontally)
-- Expose a dashboard for monitoring
+- Expose a dashboard for monitoring the health of cluster
 
 ## System Requirements
 
@@ -97,7 +98,7 @@ On docker
     + `.env` files and variables to separate development and production
 
 - Continuous integration ✅
-    + Github action for running tests
+    + Github action for running tests on every new commit
 
 - Production monitoring instrumenting ✅
     + rq dashboard to monitor cluster health
@@ -106,4 +107,4 @@ On docker
     + Redis message queue for communication between backend / rq cluster
 
 - Continuous delivery ✅
-    + Github action for building and publishing docker images
+    + Github action for building and publishing docker images to dockerhub
