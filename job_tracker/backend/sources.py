@@ -35,11 +35,16 @@ for company in companies_str.split("|"):
         pub_addr = parts[2]
     else:
         pub_addr = addr
+    if pub_addr.lower().startswith("http") or pub_addr.lower().startswith("/"):
+        pub_link = pub_addr
+    else:
+        pub_link = f"http://{pub_addr}"
+
     companies.append({
         'name': name,
         'func': generic_fetch_jobs,
-        'args': [f'http://{addr}/api/jobs', name, f'http://{pub_addr}/?id=%d'],
-        'link': f'http://{pub_addr}/'
+        'args': [f'http://{addr}/api/jobs', name, f'{pub_link}/?id=%d'],
+        'link': pub_link + '/',
     })
 
 LOCK_TIMEOUT = 5 * (len(companies) + 1)

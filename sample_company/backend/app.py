@@ -12,8 +12,6 @@ if app.debug:
     from flask_cors import CORS
     CORS(app)
 
-company_name = os.environ.get('COMPANY_NAME', 'Sample Company')
-
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///:memory:'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
@@ -83,20 +81,6 @@ def error_response(error="Error", message="An error occurred", status_code=400):
         "message": message
     }
     return jsonify(response), status_code
-
-# when run in production, serve the frontend from the build directory /var/www/html
-if not app.debug:
-    app.static_folder = '/var/www/html'
-    @app.route('/')
-    def index():
-        return app.send_static_file('index.html')
-    @app.route('/<path:path>')
-    def send_js(path):
-        return app.send_static_file(path)
-    
-@bp.route('/company', methods=['GET'])
-def get_company():
-    return success_response({"name": company_name})
 
 @bp.route('/jobs', methods=['GET'])
 def get_jobs():

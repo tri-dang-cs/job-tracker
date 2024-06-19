@@ -160,15 +160,15 @@ def init_app(app):
         # if debug mode is enabled, allow CORS
         from flask_cors import CORS
         CORS(app)
-    else:
-        # when run in production, serve the frontend from the build directory /var/www/html
-        app.static_folder = '/var/www/html'
-        # app.static_folder = '/home/user/playground/job_tracker/job_tracker/frontend/dist'
-        @app.route('/')
-        def index():
-            return app.send_static_file('index.html')
-        @app.route('/<path:path>')
-        def send_js(path):
-            return app.send_static_file(path)
+    # else:
+    #     # when run in production, serve the frontend from the build directory /var/www/html
+    #     app.static_folder = '/var/www/html'
+    #     # app.static_folder = '/home/user/playground/job_tracker/job_tracker/frontend/dist'
+    #     @app.route('/')
+    #     def index():
+    #         return app.send_static_file('index.html')
+    #     @app.route('/<path:path>')
+    #     def send_js(path):
+    #         return app.send_static_file(path)
         
     app.register_blueprint(bp)

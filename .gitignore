@@ -198,3 +198,8 @@ coverage
 *.njsproj
 *.sln
 *.sw?
+
+
+README.pdf
+
+.docker-data/

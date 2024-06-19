@@ -1,8 +1,48 @@
 version: '3'
 
 services:
+
+  fake-google-backend:
+    build: sample_company/backend
+
+  fake-google-frontend:
+    build: sample_company/frontend
+    environment:
+      VITE_COMPANY_NAME: 'Fake Google'
+      VITE_API_URL: '/fake-google/api'
+      BASE_URL: '/fake-google'
+    volumes:
+      - ./.docker-data/html/fake-google:/app/frontend/dist
+
+  fake-facebook-backend:
+    build: sample_company/backend
+
+  fake-facebook-frontend:
+    build: sample_company/frontend
+    environment:
+      VITE_COMPANY_NAME: 'Fake Facebook'
+      VITE_API_URL: '/fake-facebook/api'
+      BASE_URL: '/fake-facebook'
+    volumes:
+      - ./.docker-data/html/fake-facebook:/app/frontend/dist
+
+  fake-microsoft-backend:
+    build: sample_company/backend
+    
+  fake-microsoft-frontend:
+    build: sample_company/frontend
+    environment:
+      VITE_COMPANY_NAME: 'Fake Microsoft'
+      VITE_API_URL: '/fake-microsoft/api'
+      BASE_URL: '/fake-microsoft'
+    volumes:
+      - ./.docker-data/html/fake-microsoft:/app/frontend/dist
+
+  ## Real services
+
   redis:
     image: redis:latest
+    restart: always
 
   db:
     image: postgres:latest
@@ -13,70 +53,65 @@ services:
       POSTGRES_USER: 'jt'
       POSTGRES_PASSWORD: 'password'
 
-  fake_google:
-    build: sample_company
-    environment:
-      COMPANY_NAME: 'Fake Google'
+  nginx:
+    image: nginx:alpine
+    restart: always
     ports:
-      - "5001:5000"
-
-  fake_facebook:
-    build: sample_company
-    environment:
-      COMPANY_NAME: 'Fake Facebook'
-    ports:
-      - "5002:5000"
-
-  fake_microsoft:
-    build: sample_company
-    environment:
-      COMPANY_NAME: 'Fake Microsoft'
-    ports:
-      - "5003:5000"
-      
- 
-  rq_dashboard:
-    build: job_tracker
-    command: rq-dashboard -u redis://redis:6379
-    ports:
-      - 9181:9181
+      - "8000:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf
+      - ./.docker-data/html:/var/www/html
+     
+  rq-dashboard:
+    build: job_tracker/backend
+    command: rq-dashboard -u redis://redis:6379 --url-prefix /rq-dashboard/
     depends_on:
       - redis
 
-  job_tracker_service:
-    build: job_tracker
+  job-tracker-service:
+    build: job_tracker/backend
+    restart: always
     environment:
       REDIS_URL: 'redis://redis:6379/0'
       DATABASE_URL: 'postgresql+psycopg2://jt:password@db/jt'
-      COMPANIES: 'google,fake_google:5000,127.0.0.1:5001|facebook,fake_facebook:5000,127.0.0.1:5002|microsoft,fake_microsoft:5000,127.0.0.1:5003'
-    command: ./run-service.sh
+      COMPANIES: 'google,fake-google-backend:8000,/fake-google|facebook,fake-facebook-backend:8000,/fake-facebook|microsoft,fake-microsoft-backend:8000,/fake-microsoft'
+    command: flask --app backend.app run-service
     depends_on:
       - redis
       - db
+      - fake-google-backend
+      - fake-facebook-backend
+      - fake-microsoft-backend
   
-  job_tracker_workers:
-    build: job_tracker
+  job-tracker-workers:
+    build: job_tracker/backend
+    restart: always
     environment:
       REDIS_URL: 'redis://redis:6379/0'
       DATABASE_URL: 'postgresql+psycopg2://jt:password@db/jt'
-      COMPANIES: 'google,fake_google:5000,127.0.0.1:5001|facebook,fake_facebook:5000,127.0.0.1:5002|microsoft,fake_microsoft:5000,127.0.0.1:5003'
-    command: ./run-worker.sh
+      COMPANIES: 'google,fake-google-backend:8000,/fake-google|facebook,fake-facebook-backend:8000,/fake-facebook|microsoft,fake-microsoft-backend:8000,/fake-microsoft'
+    command: flask --app backend.app run-worker
     deploy:
       mode: replicated
       replicas: 3
     depends_on:
       - redis
       - db
+      - job-tracker-service
 
-  job_tracker:
-    build: job_tracker
+  job-tracker-backend:
+    build: job_tracker/backend
+    restart: always
     environment:
       REDIS_URL: 'redis://redis:6379/0'
-      COMPANIES: 'google,fake_google:5000,127.0.0.1:5001|facebook,fake_facebook:5000,127.0.0.1:5002|microsoft,fake_microsoft:5000,127.0.0.1:5003'
+      COMPANIES: 'google,fake-google-backend:8000,/fake-google|facebook,fake-facebook-backend:8000,/fake-facebook|microsoft,fake-microsoft-backend:8000,/fake-microsoft'
       DATABASE_URL: 'postgresql+psycopg2://jt:password@db/jt'
-      RQ_DASHBOARD: 'http://127.0.0.1:9181'
-    ports:
-      - 5000:5000
+      RQ_DASHBOARD: '/rq-dashboard/'
     depends_on:
       - redis
       - db
+
+  job-tracker-frontend:
+    build: job_tracker/frontend
+    volumes:
+      - ./.docker-data/html/app:/app/frontend/dist

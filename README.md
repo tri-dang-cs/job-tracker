@@ -79,17 +79,22 @@ On docker
 - Data analyzer ✅
     + Combine listing
     + Analyze and notify new listing
+    + Provide `/stats` for admin. [Checkout](https://github.com/tri-dang-cs/job-tracker/blob/main/job_tracker/backend/views.py#L141)
 
 - Data persistence any data store ✅
     + Use of relational database
+    + Sqlite during development and testing
+    + Postgres SQL during deployment
 
 - Unit tests ✅
 - Integration tests ✅
 - Using mock objects or any test doubles ✅
-Use `pytest` to test single task, mock request testing, integration testing
+
+    + Check out the `tests` directory [here](https://github.com/tri-dang-cs/job-tracker/tree/main/job_tracker/backend/tests)
+    + Use `pytest` to test single task, mock request testing, integration testing between APIs
 
 - Product environment ✅
-    + `.env` files and variables to separate development / testing and production
+    + `.env` files and variables to separate development and production
 
 - Continuous integration ✅
     + Github action for running tests
@@ -101,5 +106,4 @@ Use `pytest` to test single task, mock request testing, integration testing
     + Redis message queue for communication between backend / rq cluster
 
 - Continuous delivery ✅
-    + Github action for build docker images
-    + Ready to deploy
+    + Github action for building and publishing docker images

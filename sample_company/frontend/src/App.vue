@@ -19,7 +19,7 @@ import Toast from 'primevue/toast';
 import { useToast } from "primevue/usetoast";
 const toast = useToast();
 
-const company_name = ref('Sample Company');
+const company_name = import.meta.env.VITE_COMPANY_NAME || 'Sample Company';
 
 axios.defaults.baseURL = import.meta.env.VITE_API_URL || '/api';
 axios.interceptors.response.use(
@@ -50,12 +50,6 @@ const form = ref({
     description: '',
     location: ''
 });
-
-// get company name
-axios.get('/company')
-    .then(response => {
-        company_name.value = response.data.name;
-    });
 
 // load jobs
 const jobs = ref([]); 

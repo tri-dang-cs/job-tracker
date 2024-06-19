@@ -6,24 +6,18 @@ services:
     ports:
       - 6379:6379
 
-  fake_google:
-    build: sample_company
-    environment:
-      COMPANY_NAME: 'Fake Google'
+  fake-google-backend:
+    build: sample_company/backend
     ports:
       - "5001:5000"
 
   fake_facebook:
-    build: sample_company
-    environment:
-      COMPANY_NAME: 'Fake Facebook'
+    build: sample_company/backend
     ports:
       - "5002:5000"
 
   fake_microsoft:
-    build: sample_company
-    environment:
-      COMPANY_NAME: 'Fake Microsoft'
+    build: sample_company/backend
     ports:
       - "5003:5000"
       
